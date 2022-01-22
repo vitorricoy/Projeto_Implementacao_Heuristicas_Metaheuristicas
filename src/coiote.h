@@ -24,7 +24,7 @@ private:
     vector<vector<int>> pesos;
     int capacidade;
 
-    Coiote *novoCoiote(vector<Coiote *> &matilha);
+    Coiote *novoCoiote(int idtMatilha);
     vector<vector<int>> getCaminhos(Coiote *coiote);
     void transformarEmSatisfazivel(Coiote *coiote);
     void gerarPopulacaoInicial(Entrada entrada);

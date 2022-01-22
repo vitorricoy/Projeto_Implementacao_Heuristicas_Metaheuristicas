@@ -63,7 +63,7 @@ void SavingsAlgorithm::savings(int lin, int col)
     int minSaving = 0;
     for (int i = 1; i < lin; i++)
     {
-        for (int j = 1; j < col; j++)
+        for (int j = i+1; j < col; j++)
         {
             saving = distance(DEPOT, i) + distance(DEPOT, j) - distance(i, j);
             minSaving = min(saving, minSaving);
@@ -192,7 +192,7 @@ vector<pair<int, vector<int>>> SavingsAlgorithm::buildSolution()
             if (!isAssigned(route.second))
             {
                 int pos = notInternal(route.first);
-                if (pos != 0)
+                if (pos != 0 && routes[point_route[route.first]].first + demand[route.second] <= this->capacidade)
                 {
                     insertRoute(point_route[route.first], route.second, pos);
                     assigned.insert(route.second);
@@ -205,7 +205,7 @@ vector<pair<int, vector<int>>> SavingsAlgorithm::buildSolution()
             if (!isAssigned(route.first))
             {
                 int pos = notInternal(route.first);
-                if (pos != 0)
+                if (pos != 0 && routes[point_route[route.second]].first + demand[route.first] <= this->capacidade)
                 {
                     insertRoute(point_route[route.second], route.first, pos);
                     assigned.insert(route.first);
@@ -217,7 +217,7 @@ vector<pair<int, vector<int>>> SavingsAlgorithm::buildSolution()
         {
             for (int i = 0; i < this->numeroVeiculos; i++)
             {
-                if (routes[i].first == 0)
+                if (routes[i].first == 0 &&  demand[route.first] + demand[route.second] <= this->capacidade)
                 {
                     routes[i].first += demand[route.first] + demand[route.second];
                     routes[i].second.push_back(route.first);
@@ -226,6 +226,7 @@ vector<pair<int, vector<int>>> SavingsAlgorithm::buildSolution()
                     point_route[route.second] = i;
                     assigned.insert(route.first);
                     assigned.insert(route.second);
+                    break;
                 }
             }
         }
@@ -239,7 +240,7 @@ vector<pair<int, vector<int>>> SavingsAlgorithm::buildSolution()
             {
                 int pos_i = notInternal(route.first);
                 int pos_j = notInternal(route.second);
-                if (!pos_i && !pos_j)
+                if (!pos_i && !pos_j && routes[rota1].first + routes[rota2].first <= this->capacidade)
                 {
                     merge(point_route[route.first], pos_i, point_route[route.second], pos_j);
                 }
@@ -248,6 +249,20 @@ vector<pair<int, vector<int>>> SavingsAlgorithm::buildSolution()
         // remove os elementos escolhidos das listas
         savingsList.erase(savingsList.begin() + index);
         weight.erase(weight.begin() + index);
+    }
+
+    for (int i = 1; i < this->numeroClientes; i++) {
+        if (assigned.find(i) == assigned.end()) {
+            for (int j = 0; j < this->numeroVeiculos; j++)
+            {
+                if (routes[j].first == 0)
+                {
+                    routes[j].first += demand[i];
+                    routes[j].second.push_back(i);
+                    break;
+                }
+            }
+        }
     }
     // routes:  vetor contendo rotas finais e custo de cada rota
     return this->routes;
@@ -269,8 +284,8 @@ pair<int, vector<vector<vector<double>>>> SavingsAlgorithm::converterParaSolucao
         for (int point : route.second)
         {
             solution[truck][previousPoint][point] = 1;
-            previousPoint = point;
             totalCost += distance(previousPoint, point);
+            previousPoint = point;
         }
         solution[truck][previousPoint][0] = 1;
         totalCost += distance(previousPoint, 0);

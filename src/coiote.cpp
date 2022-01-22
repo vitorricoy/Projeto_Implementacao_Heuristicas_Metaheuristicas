@@ -47,7 +47,7 @@ void AlgoritmoCoiote::transformarEmSatisfazivel(Coiote *coiote)
             {
                 if (coiote->solucao[veiculo][noAtual][cliente] >= 1)
                 {
-                    if (valorMaiorCaminho < coiote->solucao[veiculo][noAtual][cliente] && (cliente == 0 || visitados.find(cliente) == visitados.end()))
+                    if (valorMaiorCaminho < coiote->solucao[veiculo][noAtual][cliente] && ((cliente == 0 && noAtual != 0) || visitados.find(cliente) == visitados.end()))
                     {
                         valorMaiorCaminho = coiote->solucao[veiculo][noAtual][cliente];
                         caminhoEscolhido = cliente;
@@ -55,7 +55,7 @@ void AlgoritmoCoiote::transformarEmSatisfazivel(Coiote *coiote)
                     possiveisCaminhos.push_back(cliente);
                 }
             }
-            if (possiveisCaminhos.size() > 1)
+            if (possiveisCaminhos.size() > 1 || (possiveisCaminhos.size() == 1 && caminhoEscolhido == -1))
             {
                 for (int i = 0; i < (int)possiveisCaminhos.size(); i++)
                 {
@@ -72,8 +72,10 @@ void AlgoritmoCoiote::transformarEmSatisfazivel(Coiote *coiote)
             }
             if (caminhoEscolhido == -1)
             {
-                coiote->solucao[veiculo][noAtual][0] = 1;
-                totalCost += this->pesos[noAtual][0];
+                if (noAtual != 0) {
+                    coiote->solucao[veiculo][noAtual][0] = 1;
+                    totalCost += this->pesos[noAtual][0];
+                }
                 break;
             }
             demandaAtendida += this->demanda[caminhoEscolhido];
@@ -132,17 +134,14 @@ void AlgoritmoCoiote::transformarEmSatisfazivel(Coiote *coiote)
                     return;
                 }
                 int proximoVeiculo = veiculosDisponiveis.back();
+                veiculosDisponiveis.pop_back();
                 vector<vector<double>> solution(this->numeroClientes, vector<double>(this->numeroClientes, 0));
-                if (p.first == 0)
-                {
-                    continue;
-                }
                 int previousPoint = 0;
                 for (int point : p.second)
                 {
                     solution[naoVisitados[previousPoint]][naoVisitados[point]] = 1;
-                    previousPoint = point;
                     totalCost += novaDistancia[previousPoint][point];
+                    previousPoint = point;
                 }
                 solution[naoVisitados[previousPoint]][0] = 1;
                 totalCost += novaDistancia[previousPoint][0];
@@ -185,7 +184,7 @@ vector<vector<int>> AlgoritmoCoiote::getCaminhos(Coiote *coiote)
             caminhos[veiculo].push_back(noAtual);
             vector<int> possiveisCaminhos;
             double valorMaiorCaminho = 0;
-            int caminhoEscolhido = 1;
+            int caminhoEscolhido = -1;
             visitados.insert(noAtual);
             for (int cliente = 0; cliente < this->numeroClientes; cliente++)
             {
@@ -199,23 +198,33 @@ vector<vector<int>> AlgoritmoCoiote::getCaminhos(Coiote *coiote)
                     possiveisCaminhos.push_back(cliente);
                 }
             }
+            if (visitados.find(caminhoEscolhido) != visitados.end() && caminhoEscolhido != 0)
+            {
+                cout << "error llllll" << endl;
+            }
+            if (caminhoEscolhido == -1)
+            {
+                caminhos[veiculo].clear();
+                break;
+            }
             if (caminhoEscolhido == 0)
             {
                 caminhos[veiculo].push_back(0);
                 break;
             }
+            noAtual = caminhoEscolhido;
         }
     }
     return caminhos;
 }
 
-Coiote *AlgoritmoCoiote::novoCoiote(vector<Coiote *> &matilha)
+Coiote *AlgoritmoCoiote::novoCoiote(int idtMatilha)
 {
     Coiote *novo = new Coiote();
     novo->idade = 0;
     novo->solucao = vector<vector<vector<double>>>(this->numeroVeiculos, vector<vector<double>>(this->numeroClientes, vector<double>(this->numeroClientes)));
-    int pai = rand() % matilha.size();
-    int mae = rand() % matilha.size();
+    int pai = rand() % matilha[idtMatilha].size();
+    int mae = rand() % matilha[idtMatilha].size();
     int j1 = rand() % (this->numeroVeiculos * this->numeroClientes * this->numeroClientes);
     int j2 = rand() % (this->numeroVeiculos * this->numeroClientes * this->numeroClientes);
     while (j1 == j2)
@@ -234,14 +243,14 @@ Coiote *AlgoritmoCoiote::novoCoiote(vector<Coiote *> &matilha)
                 if (veiculo * (this->numeroClientes * this->numeroClientes) + cliente1 * this->numeroClientes + cliente2 == j1 || aleatorio < ps)
                 {
                     //pai
-                    novo->solucao[veiculo][cliente1][cliente2] = matilha[pai]->solucao[veiculo][cliente1][cliente2];
+                    novo->solucao[veiculo][cliente1][cliente2] = matilha[idtMatilha][pai]->solucao[veiculo][cliente1][cliente2];
                 }
                 else
                 {
                     if (veiculo * (this->numeroClientes * this->numeroClientes) + cliente1 * this->numeroClientes + cliente2 == j2 || aleatorio < ps + pa)
                     {
                         //mae
-                        novo->solucao[veiculo][cliente1][cliente2] = matilha[mae]->solucao[veiculo][cliente1][cliente2];
+                        novo->solucao[veiculo][cliente1][cliente2] = matilha[idtMatilha][mae]->solucao[veiculo][cliente1][cliente2];
                     }
                     else
                     {
@@ -259,16 +268,15 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
 {
     for (int geracao = 0; geracao < this->numeroGeracoes; geracao++)
     {
-        cout << "Rodando geração " << geracao << endl;
         for (int idtMatilha = 0; idtMatilha < this->numeroMatilhas; idtMatilha++)
         {
             int maiorAdaptabilidade = 0;
             int menorAdaptabilidade = INT32_MAX;
             int idadeMaisVelho = -1;
             int posMaisVelho;
-            Coiote *alfa;
+            Coiote alfa;
             int pos = 0;
-            for (Coiote *coiote : this->matilha[idtMatilha])
+            for (Coiote *&coiote : this->matilha[idtMatilha])
             {
                 if (coiote->adaptabilidade > maiorAdaptabilidade)
                 {
@@ -278,10 +286,13 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
                 if (coiote->adaptabilidade < menorAdaptabilidade)
                 {
                     menorAdaptabilidade = coiote->adaptabilidade;
-                    alfa = coiote;
+                    alfa.adaptabilidade = coiote->adaptabilidade;
+                    alfa.idade = coiote->idade;
+                    alfa.invalido = coiote->invalido;
+                    alfa.solucao = coiote->solucao;
                 }
 
-                if (idadeMaisVelho < coiote->idade && coiote->invalido)
+                if (idadeMaisVelho < coiote->idade || coiote->invalido)
                 {
                     posMaisVelho = pos;
                     // Elimina antes os insatisfaziveis
@@ -300,7 +311,7 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
                     {
                         int somaAdaptabilidade = 0;
                         double somaValores = 0;
-                        for (Coiote *coiote : matilha[idtMatilha])
+                        for (Coiote *&coiote : matilha[idtMatilha])
                         {
                             somaValores += (maiorAdaptabilidade - (double)coiote->adaptabilidade) * coiote->solucao[veiculo][cliente1][cliente2];
                             somaAdaptabilidade += (maiorAdaptabilidade - (double)coiote->adaptabilidade);
@@ -310,7 +321,7 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
                 }
             }
 
-            for (Coiote *coiote : matilha[idtMatilha])
+            for (Coiote *&coiote : matilha[idtMatilha])
             {
                 Coiote *novoCoiote = new Coiote();
                 novoCoiote->adaptabilidade = coiote->adaptabilidade;
@@ -325,7 +336,7 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
                     {
                         for (int cliente2 = 0; cliente2 < this->numeroClientes; cliente2++)
                         {
-                            double c1 = alfa->solucao[veiculo][cliente1][cliente2] - coiote->solucao[veiculo][cliente1][cliente2];
+                            double c1 = alfa.solucao[veiculo][cliente1][cliente2] - coiote->solucao[veiculo][cliente1][cliente2];
                             double c2 = tendenciaSocial[veiculo][cliente1][cliente2] - coiote->solucao[veiculo][cliente1][cliente2];
                             novoCoiote->solucao[veiculo][cliente1][cliente2] += this->r1 * c1 + this->r2 * c2;
                         }
@@ -347,13 +358,17 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
                 }
             }
             // Processa nascimentos e mortes
-            Coiote *temp = matilha[idtMatilha][posMaisVelho];
-            matilha[idtMatilha][posMaisVelho] = novoCoiote(matilha[idtMatilha]);
-            free(temp);
+            if (!matilha[idtMatilha].empty())
+            {
+                Coiote *temp = matilha[idtMatilha][posMaisVelho];
+                matilha[idtMatilha][posMaisVelho] = novoCoiote(idtMatilha);
+                free(temp);
+            }
         }
         // Processa a transição de coiotes
         for (int idtMatilha = 0; idtMatilha < this->numeroMatilhas; idtMatilha++)
         {
+            if (matilha[idtMatilha].empty()) continue;
             double aleatorio = ((double)rand() / (RAND_MAX));
             double tamanhoMatilha = this->matilha[idtMatilha].size();
             if (aleatorio > 0.005 * (tamanhoMatilha * tamanhoMatilha))
@@ -371,7 +386,7 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
         // Atualiza as idades dos coiotes
         for (int idtMatilha = 0; idtMatilha < this->numeroMatilhas; idtMatilha++)
         {
-            for (Coiote *coiote : this->matilha[idtMatilha])
+            for (Coiote *&coiote : this->matilha[idtMatilha])
             {
                 coiote->idade++;
             }
@@ -381,7 +396,7 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
     Coiote *maisAdaptado;
     for (int idtMatilha = 0; idtMatilha < this->numeroMatilhas; idtMatilha++)
     {
-        for (Coiote *coiote : this->matilha[idtMatilha])
+        for (Coiote *&coiote : this->matilha[idtMatilha])
         {
             if (coiote->adaptabilidade < menorAdaptabilidade)
             {
@@ -390,10 +405,11 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
             }
         }
     }
+    transformarEmSatisfazivel(maisAdaptado);
     vector<vector<int>> caminhosMelhor = getCaminhos(maisAdaptado);
     for (int idtMatilha = 0; idtMatilha < this->numeroMatilhas; idtMatilha++)
     {
-        for (Coiote *coiote : this->matilha[idtMatilha])
+        for (Coiote *&coiote : this->matilha[idtMatilha])
         {
             free(coiote);
         }
