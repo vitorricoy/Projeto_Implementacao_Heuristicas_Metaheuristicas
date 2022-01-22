@@ -72,7 +72,8 @@ void AlgoritmoCoiote::transformarEmSatisfazivel(Coiote *coiote)
             }
             if (caminhoEscolhido == -1)
             {
-                if (noAtual != 0) {
+                if (noAtual != 0)
+                {
                     coiote->solucao[veiculo][noAtual][0] = 1;
                     totalCost += this->pesos[noAtual][0];
                 }
@@ -350,11 +351,11 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
                 {
                     Coiote *temp = coiote;
                     coiote = novoCoiote;
-                    free(temp);
+                    delete temp;
                 }
                 else
                 {
-                    free(novoCoiote);
+                    delete novoCoiote;
                 }
             }
             // Processa nascimentos e mortes
@@ -362,13 +363,14 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
             {
                 Coiote *temp = matilha[idtMatilha][posMaisVelho];
                 matilha[idtMatilha][posMaisVelho] = novoCoiote(idtMatilha);
-                free(temp);
+                delete temp;
             }
         }
         // Processa a transição de coiotes
         for (int idtMatilha = 0; idtMatilha < this->numeroMatilhas; idtMatilha++)
         {
-            if (matilha[idtMatilha].empty()) continue;
+            if (matilha[idtMatilha].empty())
+                continue;
             double aleatorio = ((double)rand() / (RAND_MAX));
             double tamanhoMatilha = this->matilha[idtMatilha].size();
             if (aleatorio > 0.005 * (tamanhoMatilha * tamanhoMatilha))
@@ -411,7 +413,7 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
     {
         for (Coiote *&coiote : this->matilha[idtMatilha])
         {
-            free(coiote);
+            delete coiote;
         }
     }
     return {menorAdaptabilidade, caminhosMelhor};

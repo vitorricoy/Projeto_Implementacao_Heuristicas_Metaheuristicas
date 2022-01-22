@@ -137,11 +137,8 @@ int main(int argc, char **argv)
 {
     srand(time(NULL));
     // ./prog <arquivo-entrada> <r1> <r2> <geracoes> <numero_coiotes> <numero_matilhas>
-    cout << "Lendo" << endl;
     Entrada entrada = lerArquivo(argv[1]);
-    cout << entrada.numeroClientes << endl;
-    cout << "Leu" << endl;
     AlgoritmoCoiote coiote(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), atoi(argv[5]), atoi(argv[6]), entrada);
     pair<int, vector<vector<int>>> pares = coiote.executarAlgoritmo();
-    cout << "Encontrada solução de custo: " << pares.first << endl;
+    cout << pares.first;
 }
