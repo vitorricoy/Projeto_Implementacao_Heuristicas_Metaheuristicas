@@ -2,13 +2,9 @@
 #include "savings.h"
 #include "entrada.h"
 
-#define N 10
+using namespace std;
 
 #define DEPOT 0
-#define CAPACITY 200
-#define TRUCKS_NUMBER 100
-
-using namespace std;
 
 SavingsAlgorithm::SavingsAlgorithm(Entrada entrada)
 {
@@ -17,6 +13,7 @@ SavingsAlgorithm::SavingsAlgorithm(Entrada entrada)
     this->routes = vector<pair<int, vector<int>>>(entrada.numeroVeiculos);
     this->numeroVeiculos = entrada.numeroVeiculos;
     this->numeroClientes = entrada.numeroClientes;
+    this->capacidade = entrada.capacidade;
     this->point_route.clear();
     this->savingsList.clear();
     this->weight.clear();
@@ -28,17 +25,27 @@ class RandomPickVector
 public:
     int n;
     vector<int> v;
-    RandomPickVector(vector<int> &w)
+    RandomPickVector(vector<int> w)
     {
-        srand(time(NULL));
-        n = w[0];
-        for (int i = 1; i < w.size(); i++)
+        n = 0;
+        for (int i = 0; i < (int)w.size(); i++)
         {
-            w[i] += w[i - 1];
-            n = w[i];
+            n += w[i];
+            v.push_back(n);
         }
-        v = w;
     }
+
+    void setWeight(vector<int> w)
+    {
+        n = 0;
+        v.clear();
+        for (int i = 0; i < (int)w.size(); i++)
+        {
+            n += w[i];
+            v.push_back(n);
+        }
+    }
+
     int pickIndex()
     {
         return upper_bound(v.begin(), v.end(), rand() % v.back()) - v.begin();
@@ -50,18 +57,24 @@ int SavingsAlgorithm::distance(int i, int j)
     return distanceMatrix[i][j];
 }
 
-int SavingsAlgorithm::savings(int lin, int col)
+void SavingsAlgorithm::savings(int lin, int col)
 {
     int saving;
+    int minSaving = 0;
     for (int i = 1; i < lin; i++)
     {
         for (int j = 1; j < col; j++)
         {
             saving = distance(DEPOT, i) + distance(DEPOT, j) - distance(i, j);
-
+            minSaving = min(saving, minSaving);
             weight.push_back(saving);
             savingsList.push_back(make_pair(saving, make_pair(i, j)));
         }
+    }
+
+    for (int &p : weight)
+    {
+        p -= minSaving - 1;
     }
 }
 
@@ -160,24 +173,19 @@ void SavingsAlgorithm::merge(int index_i, int pos_i, int index_j, int pos_j)
     }
 }
 
-pair<int, vector<vector<vector<double>>>> SavingsAlgorithm::buildSolution()
+vector<pair<int, vector<int>>> SavingsAlgorithm::buildSolution()
 {
-    this->savings(N, N);
-    RandomPickVector weightedSavings = RandomPickVector(weight);
+    this->savings(this->numeroClientes, this->numeroClientes);
 
+    RandomPickVector weightedSavings(weight);
     while (weight.size() > 0)
     {
+        weightedSavings.setWeight(weight);
         // escolhe um elemento aleatório da lista
         int index = weightedSavings.pickIndex();
 
         pair<int, int> route; // rota entre dois pontos
         route = savingsList[index].second;
-
-        // remove os elementos escolhidos das listas
-        savingsList.erase(savingsList.begin() + index);
-        weight.erase(weight.begin() + index);
-
-        weightedSavings = RandomPickVector(weight);
 
         if (isAssigned(route.first))
         {
@@ -207,7 +215,7 @@ pair<int, vector<vector<vector<double>>>> SavingsAlgorithm::buildSolution()
 
         if (!isAssigned(route.first) && !isAssigned(route.second))
         {
-            for (int i = 0; i < TRUCKS_NUMBER; i++)
+            for (int i = 0; i < this->numeroVeiculos; i++)
             {
                 if (routes[i].first == 0)
                 {
@@ -237,16 +245,26 @@ pair<int, vector<vector<vector<double>>>> SavingsAlgorithm::buildSolution()
                 }
             }
         }
-
-        // routes:  vetor contendo rotas finais e custo de cada rota
+        // remove os elementos escolhidos das listas
+        savingsList.erase(savingsList.begin() + index);
+        weight.erase(weight.begin() + index);
     }
-    vector<vector<vector<double>>> solution(TRUCKS_NUMBER, vector<vector<double>>(N, vector<double>(N, 0)));
+    // routes:  vetor contendo rotas finais e custo de cada rota
+    return this->routes;
+}
 
+pair<int, vector<vector<vector<double>>>> SavingsAlgorithm::converterParaSolucao(vector<pair<int, vector<int>>> rotas)
+{
+    vector<vector<vector<double>>> solution(this->numeroVeiculos, vector<vector<double>>(this->numeroClientes, vector<double>(this->numeroClientes, 0)));
     int previousPoint;
     int totalCost = 0;
-    for (int truck = 0; truck < TRUCKS_NUMBER; truck++)
+    for (int truck = 0; truck < this->numeroVeiculos; truck++)
     {
-        pair<int, vector<int>> route = routes[truck];
+        pair<int, vector<int>> route = rotas[truck];
+        if (route.first == 0)
+        {
+            continue;
+        }
         previousPoint = 0;
         for (int point : route.second)
         {
@@ -257,8 +275,5 @@ pair<int, vector<vector<vector<double>>>> SavingsAlgorithm::buildSolution()
         solution[truck][previousPoint][0] = 1;
         totalCost += distance(previousPoint, 0);
     }
-
-    pair<int, vector<vector<vector<double>>>> returnValue = make_pair(totalCost, solution);
-
-    return returnValue;
+    return make_pair(totalCost, solution);
 }

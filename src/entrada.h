@@ -1,3 +1,9 @@
+#pragma once
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
 struct Entrada
 {
     vector<int> demanda;

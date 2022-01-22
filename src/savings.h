@@ -16,15 +16,17 @@ private:
 
     int numeroVeiculos;
     int numeroClientes;
+    int capacidade;
 
     int distance(int i, int j);
-    int savings(int lin, int col);
+    void savings(int lin, int col);
     bool isAssigned(int point);
     int notInternal(int point);
     void insertRoute(int index, int point, int pos);
     void merge(int index_i, int pos_i, int index_j, int pos_j);
 
 public:
-    pair<int, vector<vector<vector<double>>>> buildSolution();
+    vector<pair<int, vector<int>>> buildSolution();
+    pair<int, vector<vector<vector<double>>>> converterParaSolucao(vector<pair<int, vector<int>>> rotas);
     SavingsAlgorithm(Entrada entrada);
 };
