@@ -28,17 +28,24 @@ int main(int argc, char *argv[])
 		std::cout << "----- STARTING GENETIC ALGORITHM" << std::endl;
 		Genetic solver(&params, &split, &population, &localSearch);
 		solver.run(commandline.nbIter, commandline.timeLimit);
-		std::cout << "----- GENETIC ALGORITHM FINISHED, TIME SPENT: " << (double)clock()/(double)CLOCKS_PER_SEC << std::endl;
+		std::cout << "----- GENETIC ALGORITHM FINISHED, TIME SPENT: " << (double)clock() / (double)CLOCKS_PER_SEC << std::endl;
 
 		// Exporting the best solution
 		if (population.getBestFound() != NULL)
 		{
 			population.getBestFound()->exportCVRPLibFormat(commandline.pathSolution);
-			population.exportSearchProgress(commandline.pathSolution + ".PG.csv", commandline.pathInstance, commandline.seed);
-			if (commandline.pathBKS != "") population.exportBKS(commandline.pathBKS);
+			//population.exportSearchProgress(commandline.pathSolution + ".PG.csv", commandline.pathInstance, commandline.seed);
+			if (commandline.pathBKS != "")
+				population.exportBKS(commandline.pathBKS);
 		}
 	}
-	catch (const string& e) { std::cout << "EXCEPTION | " << e << std::endl; }
-	catch (const std::exception& e) { std::cout << "EXCEPTION | " << e.what() << std::endl; }
+	catch (const string &e)
+	{
+		std::cout << "EXCEPTION | " << e << std::endl;
+	}
+	catch (const std::exception &e)
+	{
+		std::cout << "EXCEPTION | " << e.what() << std::endl;
+	}
 	return 0;
 }
