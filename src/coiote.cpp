@@ -5,7 +5,7 @@
 
 using namespace std;
 
-AlgoritmoCoiote::AlgoritmoCoiote(int r1, int r2, int numeroGeracoes, int numeroCoiotes, int numeroMatilhas, Entrada entrada)
+AlgoritmoCoiote::AlgoritmoCoiote(double r1, double r2, int numeroGeracoes, int numeroCoiotes, int numeroMatilhas, Entrada entrada)
 {
     this->demanda = entrada.demanda;
     this->pesos = entrada.pesos;

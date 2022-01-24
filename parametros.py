@@ -1,8 +1,9 @@
 from subprocess import PIPE, run
 
 import os
-for r1 in range(1, 6):
-    for r2 in range(1, 6):
+cont = 0
+for r1 in [0.2, 0.5, 0.75, 1]:
+    for r2 in [0.2, 0.5, 0.75, 1]:
         numCoiotes = 5
         numMatilhas = 10
         somaArquivos=0
@@ -28,6 +29,7 @@ for r1 in range(1, 6):
                 cont+=1
                 somaArquivos += (media/otimo)
         mediaParametros = somaArquivos/cont
-        with open('param_test/%s-%s-%s-%s.out'%(str(r1), str(r2), str(numCoiotes), str(numMatilhas)), 'w') as file:
+        with open('param_test/%s.out'%str(cont), 'w') as file:
             file.write('Parâmetros r1=%s, r2=%s, num_coiotes=%s, num_matilhas=%s\n'%(str(r1), str(r2), str(numCoiotes), str(numMatilhas)))
             file.write('Media=%s'%(str(mediaParametros)))
+        cont+=1

@@ -12,8 +12,8 @@ struct Coiote
 class AlgoritmoCoiote
 {
 private:
-    int r1;
-    int r2;
+    double r1;
+    double r2;
     int numeroGeracoes;
     int numeroMatilhas;
     int numeroVeiculos;
@@ -31,5 +31,5 @@ private:
 
 public:
     pair<int, vector<vector<int>>> executarAlgoritmo();
-    AlgoritmoCoiote(int r1, int r2, int numeroGeracoes, int numeroCoiotes, int numeroMatilhas, Entrada entrada);
+    AlgoritmoCoiote(double r1, double r2, int numeroGeracoes, int numeroCoiotes, int numeroMatilhas, Entrada entrada);
 };
