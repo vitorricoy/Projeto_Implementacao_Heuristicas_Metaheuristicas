@@ -1,0 +1,47 @@
+Parâmetros r1=0.2, r2=0.2, num_coiotes=5, num_matilhas=10
+Media=1.8788610176307297
+
+Parâmetros r1=0.2, r2=0.5, num_coiotes=5, num_matilhas=10
+Media=1.8842718217590575
+
+Parâmetros r1=0.2, r2=0.75, num_coiotes=5, num_matilhas=10
+Media=1.8822524339134048
+
+Parâmetros r1=0.2, r2=1, num_coiotes=5, num_matilhas=10
+Media=1.8834997505982007
+
+Parâmetros r1=0.5, r2=0.2, num_coiotes=5, num_matilhas=10
+Media=1.892562900568629
+
+Parâmetros r1=0.5, r2=0.5, num_coiotes=5, num_matilhas=10
+Media=1.8894764912303443
+
+Parâmetros r1=0.5, r2=0.75, num_coiotes=5, num_matilhas=10
+Media=1.8793072176356027
+
+Parâmetros r1=0.5, r2=1, num_coiotes=5, num_matilhas=10
+Media=1.8694227212401675
+
+Parâmetros r1=0.75, r2=0.2, num_coiotes=5, num_matilhas=10
+Media=1.8925224211779774
+
+Parâmetros r1=0.75, r2=0.5, num_coiotes=5, num_matilhas=10
+Media=1.870842526104849
+
+Parâmetros r1=0.75, r2=0.75, num_coiotes=5, num_matilhas=10
+Media=1.855905577315965
+
+Parâmetros r1=0.75, r2=1, num_coiotes=5, num_matilhas=10
+Media=1.7552487177216969
+
+Parâmetros r1=1, r2=0.2, num_coiotes=5, num_matilhas=10
+Media=1.8858526733152017
+
+Parâmetros r1=1, r2=0.5, num_coiotes=5, num_matilhas=10
+Media=1.7852279151077222
+
+Parâmetros r1=1, r2=0.75, num_coiotes=5, num_matilhas=10
+Media=1.6646478086194154
+
+Parâmetros r1=1, r2=1, num_coiotes=5, num_matilhas=10
+Media=1.7420668663384846

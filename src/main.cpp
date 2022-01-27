@@ -21,8 +21,8 @@ vector<vector<int>> readDistances(ifstream &inputFile, int nbClients)
 struct No
 {
     int demanda;
-    int coordX;
-    int coordY;
+    double coordX;
+    double coordY;
     double anguloPolar;
     int id;
 };

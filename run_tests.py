@@ -4,14 +4,14 @@ import os
 somaArquivos=0
 cont=0
 for dir in os.listdir("test"):
-    if dir not in ['P', 'A', 'B', 'DIMACS']:
+    if dir in ['A']:
         for file in os.listdir("test/"+dir):
             if file.endswith(".vrp"):
                 arq, ext = os.path.splitext(file)
                 results = []
                 times = []
                 for i in range(5):
-                    command = ["./prog", "test/"+dir+"/"+str(file), "1", "1", "500", "5", "10"]
+                    command = ["./prog", "test/"+dir+"/"+str(file), "1", "0.75", "100", "5", "10"]
                     start = timer()
                     result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True)
                     end = timer()

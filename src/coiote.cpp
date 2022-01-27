@@ -267,21 +267,44 @@ Coiote *AlgoritmoCoiote::novoCoiote(int idtMatilha)
 
 pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
 {
-    for (int geracao = 0; geracao < this->numeroGeracoes; geracao++)
+    int geracoesSemMelhora = 0;
+    Coiote melhor;
+    int adaptabilidadeMelhor = INT32_MAX;
+    while (geracoesSemMelhora <= this->numeroGeracoes)
     {
         for (int idtMatilha = 0; idtMatilha < this->numeroMatilhas; idtMatilha++)
         {
             int maiorAdaptabilidade = 0;
             int menorAdaptabilidade = INT32_MAX;
             int idadeMaisVelho = -1;
+            int adaptabilidadeMaisVelho = 0;
             int posMaisVelho;
             Coiote alfa;
             int pos = 0;
             for (Coiote *&coiote : this->matilha[idtMatilha])
             {
+                if (coiote->invalido)
+                {
+                    posMaisVelho = pos;
+                    // Elimina antes os insatisfaziveis
+                    idadeMaisVelho = (coiote->invalido ? INT_MAX : coiote->idade);
+                    pos += 1;
+                    continue;
+                }
+
                 if (coiote->adaptabilidade > maiorAdaptabilidade)
                 {
                     maiorAdaptabilidade = coiote->adaptabilidade;
+                }
+
+                if (coiote->adaptabilidade < adaptabilidadeMelhor)
+                {
+                    melhor.adaptabilidade = coiote->adaptabilidade;
+                    melhor.idade = coiote->idade;
+                    melhor.invalido = coiote->invalido;
+                    melhor.solucao = coiote->solucao;
+                    adaptabilidadeMelhor = coiote->adaptabilidade;
+                    geracoesSemMelhora = 0;
                 }
 
                 if (coiote->adaptabilidade < menorAdaptabilidade)
@@ -293,12 +316,13 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
                     alfa.solucao = coiote->solucao;
                 }
 
-                if (idadeMaisVelho < coiote->idade || coiote->invalido)
+                if (idadeMaisVelho < coiote->idade || (idadeMaisVelho == coiote->idade && adaptabilidadeMaisVelho > coiote->adaptabilidade))
                 {
                     posMaisVelho = pos;
                     // Elimina antes os insatisfaziveis
-                    idadeMaisVelho = (coiote->invalido ? INT_MAX : coiote->idade);
+                    idadeMaisVelho = coiote->idade;
                 }
+
                 pos += 1;
             }
 
@@ -393,22 +417,10 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
                 coiote->idade++;
             }
         }
+        geracoesSemMelhora++;
     }
-    int menorAdaptabilidade = INT32_MAX;
-    Coiote *maisAdaptado;
-    for (int idtMatilha = 0; idtMatilha < this->numeroMatilhas; idtMatilha++)
-    {
-        for (Coiote *&coiote : this->matilha[idtMatilha])
-        {
-            if (coiote->adaptabilidade < menorAdaptabilidade)
-            {
-                menorAdaptabilidade = coiote->adaptabilidade;
-                maisAdaptado = coiote;
-            }
-        }
-    }
-    transformarEmSatisfazivel(maisAdaptado);
-    vector<vector<int>> caminhosMelhor = getCaminhos(maisAdaptado);
+    transformarEmSatisfazivel(&melhor);
+    vector<vector<int>> caminhosMelhor = getCaminhos(&melhor);
     for (int idtMatilha = 0; idtMatilha < this->numeroMatilhas; idtMatilha++)
     {
         for (Coiote *&coiote : this->matilha[idtMatilha])
@@ -416,5 +428,5 @@ pair<int, vector<vector<int>>> AlgoritmoCoiote::executarAlgoritmo()
             delete coiote;
         }
     }
-    return {menorAdaptabilidade, caminhosMelhor};
+    return {adaptabilidadeMelhor, caminhosMelhor};
 }

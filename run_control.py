@@ -11,9 +11,16 @@ for dir in os.listdir("test"):
                 results = []
                 times = []
                 for i in range(5):
-                    command = ["controle/Program/genvrp", "test/"+dir+"/"+str(file), "control_results/"+dir+"/"+arq+"_"+str(i)+".sol", "-it", "500"]
+                    command = ["controle/Program/genvrp", "test/"+dir+"/"+str(file), "control_results/"+dir+"/lixo/"+arq+"_"+str(i)+".sol", "-it", "100"]
                     start = timer()
                     result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True)
                     end = timer()
-                    with open("control_results/"+dir+"/"+arq+"_"+str(i)+".sol", "a") as myfile:
-                        myfile.write("Tempo = %s"%(str(end-start)))
+                    with open("control_results/"+dir+"/lixo/"+arq+"_"+str(i)+".sol", "r") as myfile:
+                        lines = myfile.read().splitlines()
+                        costLine = lines[-2]
+                        cost = costLine.split(' ')[1]
+                        results.append(cost)
+                    times.append(end-start)
+                with open('control_results/'+str(dir)+'/'+arq+'.sol', 'w') as file:
+                    file.write('Resultados = '+str(results))
+                    file.write('\nTempos = '+str(times))
