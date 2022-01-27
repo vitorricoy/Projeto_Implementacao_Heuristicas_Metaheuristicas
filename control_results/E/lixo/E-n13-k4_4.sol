@@ -1,6 +1,6 @@
-Route #1: 6 10 12 9
-Route #2: 2 7 4 11
-Route #3: 1
-Route #4: 8 5 3
+Route #1: 8 5 3
+Route #2: 1
+Route #3: 2 7 4 11
+Route #4: 9 12 10 6
 Cost 247
-Time 0.014182
+Time 0.013798

@@ -1,9 +1,9 @@
-Route #1: 26 5 14 3 24
-Route #2: 16 4 17 1 25
-Route #3: 29 23
-Route #4: 30
-Route #5: 19 2 8 22 6 20
-Route #6: 27 7 12 18 10
-Route #7: 21 11 13 9 28 15
+Route #1: 20 6 22 8 2 19
+Route #2: 15 28 9 13 11 21
+Route #3: 23 29
+Route #4: 16 5 17 4 26
+Route #5: 27 7 12 18 10
+Route #6: 24 3 14 1 25
+Route #7: 30
 Cost 379
-Time 0.0566
+Time 0.055944

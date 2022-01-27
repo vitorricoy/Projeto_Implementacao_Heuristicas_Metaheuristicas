@@ -26,26 +26,27 @@ SOFTWARE.*/
 #include <iostream>
 #include <string>
 #include <climits>
+#include <ctime>
 
 class CommandLine
 {
 public:
-
-	int nbIter		= 20000;		// Number of iterations without improvement until termination. Default value: 20,000 iterations
-	int timeLimit   = INT_MAX;		// CPU time limit until termination in seconds. Default value: infinity
-	int seed		= 0;			// Random seed. Default value: 0
-	int nbVeh		= INT_MAX;		// Number of vehicles. Default value: infinity
-	std::string pathInstance;		// Instance path
-	std::string pathSolution;		// Solution path
-	std::string pathBKS = "";		// BKS path
+	int nbIter = 20000;		  // Number of iterations without improvement until termination. Default value: 20,000 iterations
+	int timeLimit = INT_MAX;  // CPU time limit until termination in seconds. Default value: infinity
+	int seed = time(nullptr); // Random seed. Default value: 0
+	int nbVeh = INT_MAX;	  // Number of vehicles. Default value: infinity
+	std::string pathInstance; // Instance path
+	std::string pathSolution; // Solution path
+	std::string pathBKS = ""; // BKS path
 
 	// Reads the line of command and extracts possible options
-	CommandLine(int argc, char* argv[])
+	CommandLine(int argc, char *argv[])
 	{
 		if (argc % 2 != 1 || argc > 13 || argc < 3)
 		{
 			std::cout << "----- NUMBER OF COMMANDLINE ARGUMENTS IS INCORRECT: " << argc << std::endl;
-			display_help(); throw std::string("Incorrect line of command");
+			display_help();
+			throw std::string("Incorrect line of command");
 		}
 		else
 		{
@@ -54,19 +55,20 @@ public:
 			for (int i = 3; i < argc; i += 2)
 			{
 				if (std::string(argv[i]) == "-t")
-					timeLimit = atoi(argv[i+1]);
+					timeLimit = atoi(argv[i + 1]);
 				else if (std::string(argv[i]) == "-it")
-					nbIter  = atoi(argv[i+1]);
+					nbIter = atoi(argv[i + 1]);
 				else if (std::string(argv[i]) == "-bks")
-					pathBKS = std::string(argv[i+1]);
+					pathBKS = std::string(argv[i + 1]);
 				else if (std::string(argv[i]) == "-seed")
-					seed    = atoi(argv[i+1]);
+					seed = atoi(argv[i + 1]);
 				else if (std::string(argv[i]) == "-veh")
-					nbVeh = atoi(argv[i+1]);
+					nbVeh = atoi(argv[i + 1]);
 				else
 				{
 					std::cout << "----- ARGUMENT NOT RECOGNIZED: " << std::string(argv[i]) << std::endl;
-					display_help(); throw std::string("Incorrect line of command");
+					display_help();
+					throw std::string("Incorrect line of command");
 				}
 			}
 		}
