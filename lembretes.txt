@@ -1,9 +1,0 @@
-- Falar da representação de uma solução para a heurística que criou um gargalo grande de memória e tempo.
-
-- LEMBRAR DE COLOCAR A LISTA DE VALORES E TEMPOS DAS 5 EXECUÇÕES DA HEURISTICA DE CONTROLE E PROPOSTA
-
-- Falar que exclui os arquivos com tamanho maior que 50 do conjunto P
-
-- Explicar a escolha dos parametros (numero de coiotes por causa da formula de mudar de matilha explicada no doc)
-
-- Falar que queria 20 packs de coiote mas usou 10 pela limitação de recursos
